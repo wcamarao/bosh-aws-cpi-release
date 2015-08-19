@@ -2,6 +2,12 @@
 
 set -e -x
 
+mkdir /terraform && \
+    apt-get install unzip && \
+    wget https://dl.bintray.com/mitchellh/terraform/terraform_0.5.1_linux_amd64.zip && \
+    unzip terraform*.zip -d /terraform && \
+    rm terraform*.zip
+
 source bosh-cpi-release/ci/tasks/utils.sh
 
 check_param aws_access_key_id

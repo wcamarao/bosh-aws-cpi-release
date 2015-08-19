@@ -300,7 +300,7 @@ resources:
   type: git
   source:
     uri: git@github.com:cloudfoundry-incubator/bosh-aws-cpi-release.git
-    branch: master
+    branch: wip-test-terraform
     private_key: {{github_deployment_key__bosh-aws-cpi-release}}
     ignore_paths:
       - .final_builds/**/*.yml
