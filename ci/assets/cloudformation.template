@@ -1,36 +1,7 @@
-//TODO: heredoc to replace interpolated values
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
 
   "Description" : "Template for creating BOSH AWS infrastructure for concourse ci.",
-
-  "Parameters" : {
-
-    "InstanceType" : {
-      "Description" : "WebServer EC2 instance type",
-      "Type" : "String",
-      "Default" : "m1.small",
-      "AllowedValues" : [ "t1.micro", "t2.micro", "t2.small", "t2.medium", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge", "c1.medium", "c1.xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "g2.2xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge", "hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"]
-,
-      "ConstraintDescription" : "must be a valid EC2 instance type."
-    },
-
-    "KeyName": {
-      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
-      "Type": "AWS::EC2::KeyPair::KeyName",
-      "ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
-    },
-
-    "SSHLocation" : {
-      "Description" : " The IP address range that can be used to SSH to the EC2 instances",
-      "Type": "String",
-      "MinLength": "9",
-      "MaxLength": "18",
-      "Default": "0.0.0.0/0",
-      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
-    }
-  },
 
   "Mappings" : {
     "Region2Examples" : {
@@ -44,8 +15,8 @@
       "ap-southeast-2" : { "Examples" : "https://s3-ap-southeast-2.amazonaws.com/cloudformation-examples-ap-southeast-2" },
       "sa-east-1"      : { "Examples" : "https://s3-sa-east-1.amazonaws.com/cloudformation-examples-sa-east-1" },
       "cn-north-1"     : { "Examples" : "https://s3.cn-north-1.amazonaws.com.cn/cloudformation-examples-cn-north-1" }
-    }
-,
+    },
+
     "AWSInstanceType2Arch" : {
       "t1.micro"    : { "Arch" : "PV64"   },
       "t2.micro"    : { "Arch" : "HVM64"  },
@@ -92,8 +63,8 @@
       "hs1.8xlarge" : { "Arch" : "HVM64"  },
       "cr1.8xlarge" : { "Arch" : "HVM64"  },
       "cc2.8xlarge" : { "Arch" : "HVM64"  }
-    }
-,
+    },
+
     "AWSRegionArch2AMI" : {
       "us-east-1"        : {"PV64" : "ami-1ccae774", "HVM64" : "ami-1ecae776", "HVMG2" : "ami-8c6b40e4"},
       "us-west-2"        : {"PV64" : "ami-ff527ecf", "HVM64" : "ami-e7527ed7", "HVMG2" : "ami-abbe919b"},
@@ -115,7 +86,7 @@
       "Type" : "AWS::EC2::VPC",
       "Properties" : {
         "CidrBlock" : "10.0.0.0/16",
-        "Tags" : [ {"Key" : "Name", "Value" : "${build_id}" } ]
+        "Tags" : [ {"Key" : "Name", "Value" : "bats" } ]
       }
     },
 
@@ -124,15 +95,14 @@
       "Properties" : {
         "VpcId" : { "Ref" : "VPC" },
         "CidrBlock" : "10.0.0.0/24",
-        "Tags" : [ {"Key" : "Name", "Value" : "${build_id}" } ]
+        "Tags" : [ {"Key" : "Name", "Value" : "bats" } ]
       }
     },
 
     "InternetGateway" : {
       "Type" : "AWS::EC2::InternetGateway",
       "Properties" : {
-        "VpcId" : { "Ref" : "VPC" },
-        "Tags" : [ {"Key" : "Name", "Value" : "${build_id}" } ]
+        "Tags" : [ {"Key" : "Name", "Value" : "bats" } ]
       }
     },
 
@@ -148,7 +118,7 @@
       "Type" : "AWS::EC2::RouteTable",
       "Properties" : {
         "VpcId" : {"Ref" : "VPC"},
-        "Tags" : [ {"Key" : "Name", "Value" : "${build_id}" } ]
+        "Tags" : [ {"Key" : "Name", "Value" : "bats" } ]
       }
     },
 
@@ -174,7 +144,7 @@
       "Type" : "AWS::EC2::NetworkAcl",
       "Properties" : {
         "VpcId" : {"Ref" : "VPC"},
-        "Tags" : [ {"Key" : "Name", "Value" : "${build_id}" } ]
+        "Tags" : [ {"Key" : "Name", "Value" : "bats" } ]
       }
     },
 
@@ -186,7 +156,7 @@
         "Protocol" : "-1",
         "RuleAction" : "allow",
         "Egress" : "false",
-        "CidrBlock" : "0.0.0.0/0",
+        "CidrBlock" : "0.0.0.0/0"
       }
     },
 
@@ -198,7 +168,7 @@
         "Protocol" : "-1",
         "RuleAction" : "allow",
         "Egress" : "true",
-        "CidrBlock" : "0.0.0.0/0",
+        "CidrBlock" : "0.0.0.0/0"
       }
     },
 
@@ -210,21 +180,35 @@
       }
     },
 
-    "IPAddress_Director" : {
+    "IPAddressUbuntuDirector" : {
       "Type" : "AWS::EC2::EIP",
       "DependsOn" : "AttachGateway",
       "Properties" : {
-        "Domain" : "vpc",
-        "InstanceId" : { "Ref" : "WebServerInstance" }
+        "Domain" : "vpc"
       }
     },
 
-    "IPAddress_BATS" : {
+    "IPAddressUbuntuBATS" : {
       "Type" : "AWS::EC2::EIP",
       "DependsOn" : "AttachGateway",
       "Properties" : {
-        "Domain" : "vpc",
-        "InstanceId" : { "Ref" : "WebServerInstance" }
+        "Domain" : "vpc"
+      }
+    },
+
+    "IPAddressCentosDirector" : {
+      "Type" : "AWS::EC2::EIP",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "Domain" : "vpc"
+      }
+    },
+
+    "IPAddressCentosBATS" : {
+      "Type" : "AWS::EC2::EIP",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "Domain" : "vpc"
       }
     },
 
@@ -233,39 +217,103 @@
       "Properties" : {
         "VpcId" : { "Ref" : "VPC" },
         "GroupDescription" : "allows local and concourse traffic",
-        "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "SourceSecurityGroupId" : { "Ref" : "BATSSecurityGroup"}},
-          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"},
-          {"IpProtocol" : "tcp", "FromPort" : "6868", "ToPort" : "6868", "CidrIp" : "0.0.0.0/0"},
-          {"IpProtocol" : "tcp", "FromPort" : "25555", "ToPort" : "25555", "CidrIp" : "0.0.0.0/0"},
-          {"IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "SourceSecurityGroupId" : { "Ref" : "BATSSecurityGroup"}}
-         ],
-         "SecurityGroupEgress" : [
-           {"IpProtocol" : "-1", "FromPort" : "0", "ToPort" : "0", "CidrIp" : "0.0.0.0/0"},
-         ],
-        "Tags" : [ {"Key" : "Name", "Value" : "${build_id}" } ]
+        "Tags" : [ {"Key" : "Name", "Value" : "bats" } ]
       }
     },
+
+    "SGIngress1": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+       "Properties": {
+          "GroupId": { "Ref": "BATSSecurityGroup" },
+          "IpProtocol": "tcp",
+          "SourceSecurityGroupId": { "Ref": "BATSSecurityGroup" },
+          "FromPort" : "0",
+          "ToPort": "65535"
+      }
+    },
+
+    "SGIngress2": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+       "Properties": {
+          "GroupId": { "Ref" : "BATSSecurityGroup" },
+          "IpProtocol": "tcp",
+          "CidrIp" : "0.0.0.0/0",
+           "FromPort" : "22",
+          "ToPort": "22"
+      }
+    },
+
+    "SGIngress3": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+       "Properties": {
+          "GroupId": { "Ref" : "BATSSecurityGroup" },
+          "IpProtocol": "tcp",
+          "CidrIp" : "0.0.0.0/0",
+          "FromPort" : "6868",
+          "ToPort": "6868"
+      }
+    },
+
+    "SGIngress4": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+       "Properties": {
+          "GroupId": { "Ref" : "BATSSecurityGroup" },
+          "IpProtocol": "tcp",
+          "CidrIp" : "0.0.0.0/0",
+          "FromPort" : "25555",
+          "ToPort": "25555"
+      }
+    },
+
+    "SGIngress5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+       "Properties": {
+          "GroupId": { "Ref" : "BATSSecurityGroup" },
+          "IpProtocol": "udp",
+          "SourceSecurityGroupId": { "Ref": "BATSSecurityGroup" },
+          "FromPort" : "0",
+          "ToPort": "0"
+      }
+    },
+
+    "SGEgress1": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+       "Properties": {
+          "GroupId": { "Ref" : "BATSSecurityGroup" },
+          "IpProtocol": "udp",
+          "CidrIp" : "0.0.0.0/0",
+          "FromPort" : "0",
+          "ToPort": "0"
+      }
+    }
   },
 
   "Outputs" : {
-    "director_vip" : {
-      "Value" : { "Ref" : "IPAddress_Director"},
-      "Description" : "EIP Allocated for Director"
-    }
-    "bats_vip" : {
-      "Value" : { "Ref" : "IPAddress_BATS"},
-      "Description" : "EIP Allocated for BATS"
-    }
-    "subnet_id" : {
+    "ubuntudirectorvip" : {
+      "Value" : { "Ref" : "IPAddressUbuntuDirector"},
+      "Description" : "EIP Allocated for Ubuntu Director"
+    },
+    "ubuntubatsvip" : {
+      "Value" : { "Ref" : "IPAddressUbuntuBATS"},
+      "Description" : "EIP Allocated for Ubuntu BATS"
+    },
+    "centosdirectorvip" : {
+      "Value" : { "Ref" : "IPAddressCentosDirector"},
+      "Description" : "EIP Allocated for Centos Director"
+    },
+    "centosbatsvip" : {
+      "Value" : { "Ref" : "IPAddressCentosBATS"},
+      "Description" : "EIP Allocated for Centos BATS"
+    },
+    "subnetid" : {
       "Value" : { "Ref" : "Subnet"},
       "Description" : "bats-subnet id"
-    }
-    "security_group_name" : {
+    },
+    "securitygroupname" : {
       "Value" : { "Ref" : "BATSSecurityGroup"},
       "Description" : "bats security group id"
-    }
-    "availability_zone" : {
+    },
+    "availabilityzone" : {
       "Value" : { "Fn::GetAtt" : ["Subnet", "AvailabilityZone"] },
       "Description" : "bats subnet availability zone"
     }
