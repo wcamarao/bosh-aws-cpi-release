@@ -220,7 +220,7 @@
           "IpProtocol": "udp",
           "SourceSecurityGroupId": { "Ref": "BATSSecurityGroup" },
           "FromPort" : "0",
-          "ToPort": "0"
+          "ToPort": "65535"
       }
     },
 

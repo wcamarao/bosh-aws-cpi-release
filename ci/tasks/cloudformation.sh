@@ -9,20 +9,12 @@ check_param aws_secret_access_key
 check_param region_name
 check_param base_os
 
-apt-get update
-apt-get -y install python
-curl -O https://bootstrap.pypa.io/get-pip.py
-python get-pip.py
-apt-get -y install groff
-apt-get -y install jq
-pip install awscli
-
-export_file=cloudformation-${base_os}-exports.sh
-stack_name="aws-cpi-stack"
-
 export AWS_ACCESS_KEY_ID=${aws_access_key_id}
 export AWS_SECRET_ACCESS_KEY=${aws_secret_access_key}
 export AWS_DEFAULT_REGION=${region_name}
+
+export_file=cloudformation-${base_os}-exports.sh
+stack_name="aws-cpi-stack"
 
 aws cloudformation create-stack \
     --stack-name      ${stack_name} \
